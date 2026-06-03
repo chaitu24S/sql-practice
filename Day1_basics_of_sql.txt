@@ -1,0 +1,122 @@
+CREATE DATABASE learning_db;
+
+Output:CREATE DATABASE
+
+\l
+
+Output: 
+                                                             List of databases
+    Name     |  Owner   | Encoding | Locale Provider |      Collate       |       Ctype        | Locale | ICU Rules |   Access privileges
+-------------+----------+----------+-----------------+--------------------+--------------------+--------+-----------+-----------------------
+ learning_db | postgres | UTF8     | libc            | English_India.1252 | English_India.1252 |        |           |
+ postgres    | postgres | UTF8     | libc            | English_India.1252 | English_India.1252 |        |           |
+ template0   | postgres | UTF8     | libc            | English_India.1252 | English_India.1252 |        |           | =c/postgres          +
+             |          |          |                 |                    |                    |        |           | postgres=CTc/postgres
+ template1   | postgres | UTF8     | libc            | English_India.1252 | English_India.1252 |        |           | =c/postgres          +
+             |          |          |                 |                    |                    |        |           | postgres=CTc/postgres
+(4 rows)
+
+
+\c learning_db
+
+Output:You are now connected to database "learning_db" as user "postgres".
+
+CREATE TABLE customers (customer_id INT, customer_name VARCHAR(50));
+
+Output: CREATE TABLE
+
+CREATE Table orders (order_id INT, customer_id INT, amount INT);
+
+Output: CREATE TABLE
+
+\dt
+
+Output:
+            List of tables
+ Schema |   Name    | Type  |  Owner
+--------+-----------+-------+----------
+ public | customers | table | postgres
+ public | orders    | table | postgres
+(2 rows)
+
+
+INSERT INTO customers VALUES (1, 'Alice'), (2, 'Bob'), (3, 'Charlie');
+
+Output: INSERT 0 3
+
+INSERT INTO orders VALUES (101, 1, 500), (102, 1, 700), (103, 3, 300);
+
+Output: INSERT 0 3
+
+SELECT * FROM customers;
+
+Output:
+ customer_id | customer_name
+-------------+---------------
+           1 | Alice
+           2 | Bob
+           3 | Charlie
+(3 rows)
+
+SELECT * FROM orders;
+
+Output:
+ order_id | customer_id | amount
+----------+-------------+--------
+      101 |           1 |    500
+      102 |           1 |    700
+      103 |           3 |    300
+(3 rows)
+
+Q1
+
+Show all customers.
+
+SELECT * FROM customers;
+
+Output: 
+customer_id | customer_name
+-------------+---------------
+           1 | Alice
+           2 | Bob
+           3 | Charlie
+
+Q2
+
+Show all orders above 400.
+
+SELECT * FROM orders WHERE amount > 400;
+
+Output:
+ order_id | customer_id | amount
+----------+-------------+--------
+      101 |           1 |    500
+      102 |           1 |    700
+(2 rows)
+
+Q3
+
+Find total order amount per customer.
+
+SELECT c.customer_name, SUM(orders.amount) AS total_order_amount FROM customers c JOIN orders ON c.customer_id = orders.customer_id GROUP BY c.customer_id, c.customer_name;
+
+Output: 
+ customer_name | total_order_amount
+---------------+--------------------
+ Charlie       |                300
+ Alice         |               1200
+(2 rows)
+
+Q4
+
+Show customer name and order amount using JOIN.
+
+SELECT c.customer_name, o.amount FROM customers c JOIN orders o ON c.customer_id = o.customer_id;
+
+Output: 
+ customer_name | amount
+---------------+--------
+ Alice         |    500
+ Alice         |    700
+ Charlie       |    300
+(3 rows)
