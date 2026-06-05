@@ -1,0 +1,65 @@
+CREATE TABLE sales (sale_id INT, customer_name VARCHAR(50), amount INT);
+CREATE TABLE
+
+\dt
+            List of tables
+ Schema |   Name    | Type  |  Owner
+--------+-----------+-------+----------
+ public | customers | table | postgres
+ public | employees | table | postgres
+ public | orders    | table | postgres
+ public | sales     | table | postgres
+ public | users     | table | postgres
+(5 rows)
+
+INSERT INTO sales VALUES (1, 'Alice', 500), (2, 'Bob', 700), (3,'Alice', 300), (4, 'Charlie', 1000), (5, 'Bob', 400);
+INSERT 0 5
+
+SELECT * FROM sales;
+ sale_id | customer_name | amount
+---------+---------------+--------
+       1 | Alice         |    500
+       2 | Bob           |    700
+       3 | Alice         |    300
+       4 | Charlie       |   1000
+       5 | Bob           |    400
+(5 rows)
+
+SELECT customer_name, SUM(amount) AS total_sales FROM sales GROUP BY customer_name;
+ customer_name | total_sales
+---------------+-------------
+ Alice         |         800
+ Bob           |        1100
+ Charlie       |        1000
+(3 rows)
+
+SELECT customer_name, SUM(amount) AS total_sales FROM sales GROUP BY customer_name ORDER BY total_sales DESC LIMIT 1;
+ customer_name | total_sales
+---------------+-------------
+ Bob           |        1100
+(1 row)
+
+SELECT customer_name, SUM(amount) AS total_sales FROM sales GROUP BY customer_name HAVING SUM(amount) > 800;
+ customer_name | total_sales
+---------------+-------------
+ Bob           |        1100
+ Charlie       |        1000
+(2 rows)
+
+SELECT AVG(total_sales) AS avg_customer_sales FROM ( SELECT customer_name, SUM(amount) AS total_sales FROM sales GROUP BY customer_name) t;
+  avg_customer_sales
+----------------------
+ 966.6666666666666667
+(1 row)
+
+
+SELECT customer_name, COUNT(*) AS transaction_count
+learning_db-# FROM sales
+learning_db-# GROUP BY customer_name;
+ customer_name | transaction_count
+---------------+-------------------
+ Alice         |                 2
+ Bob           |                 2
+ Charlie       |                 1
+(3 rows)
+
