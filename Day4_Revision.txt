@@ -1,0 +1,61 @@
+CREATE TABLE products (
+    product_id INT,
+    product_name VARCHAR(50),
+    category VARCHAR(50),
+    price INT
+);
+
+INSERT INTO products VALUES
+(1,'Laptop','Electronics',70000),
+(2,'Phone','Electronics',40000),
+(3,'Chair','Furniture',5000),
+(4,'Table','Furniture',8000),
+(5,'Monitor','Electronics',15000);
+
+
+Show all electronics products.
+
+SELECT product_name, category FROM products WHERE category = 'Electronics';
+ product_name |  category
+--------------+-------------
+ Laptop       | Electronics
+ Phone        | Electronics
+ Monitor      | Electronics
+(3 rows)
+
+Find average price per category.
+
+SELECT  category, AVG(price) AS average_price FROM products GROUP BY category;
+  category   |     average_price
+-------------+-----------------------
+ Furniture   | 6500.0000000000000000
+ Electronics |    41666.666666666667
+(2 rows)
+
+Find the most expensive product.
+
+SELECT product_name, price FROM products ORDER BY price DESC LIMIT 1;
+ product_name | price
+--------------+-------
+ Laptop       | 70000
+(1 row)
+
+
+Find products above average price.
+
+SELECT product_name, price FROM products WHERE price > ( SELECT AVG(price) FROM products);
+ product_name | price
+--------------+-------
+ Laptop       | 70000
+ Phone        | 40000
+(2 rows)
+
+
+Count products in each category.
+
+SELECT COUNT(product_name), category FROM products GROUP BY category;
+ count |  category
+-------+-------------
+     2 | Furniture
+     3 | Electronics
+(2 rows)
