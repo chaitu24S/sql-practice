@@ -1,0 +1,86 @@
+CREATE TABLE employee_salary (
+    emp_id INT,
+    emp_name VARCHAR(50),
+    department VARCHAR(50),
+    salary INT
+);
+
+INSERT INTO employee_salary VALUES
+(1,'Alice','IT',50000),
+(2,'Bob','IT',70000),
+(3,'Charlie','HR',60000),
+(4,'David','IT',80000),
+(5,'Eva','HR',65000),
+(6,'Frank','Finance',90000);
+
+Q1
+
+Rank employees by salary.
+
+SELECT emp_name, salary, RANK() OVER (ORDER BY salary DESC) AS Rank_salary FROM employee_salary;
+ emp_name | salary | rank_salary
+----------+--------+-------------
+ Frank    |  90000 |           1
+ David    |  80000 |           2
+ Bob      |  70000 |           3
+ Eva      |  65000 |           4
+ Charlie  |  60000 |           5
+ Alice    |  50000 |           6
+(6 rows)
+
+Q2
+
+Show highest salary in each department.
+SELECT department, MAX(salary) FROM employee_salary GROUP BY department;
+ department |  max
+------------+-------
+ Finance    | 90000
+ IT         | 80000
+ HR         | 65000
+(3 rows)
+
+Q3
+
+Show second highest salary.
+
+SELECT emp_name, department, salary FROM ( SELECT emp_name, department, salary, DENSE_RANK() OVER ( PARTITION BY department ORDER BY salary DESC) AS rnk FROM employee_salary) t WHERE rnk = 2;
+ emp_name | department | salary
+----------+------------+--------
+ Charlie  | HR         |  60000
+ Bob      | IT         |  70000
+(2 rows)
+
+Q4
+
+Find employees earning above department average.
+
+SELECT emp_name, department, salary FROM employee_salary e WHERE salary > (SELECT AVG(salary) FROM employee_salary WHERE department = e.department);
+ emp_name | department | salary
+----------+------------+--------
+ Bob      | IT         |  70000
+ David    | IT         |  80000
+ Eva      | HR         |  65000
+(3 rows)
+
+
+Q5
+
+Show running salary total ordered by salary.
+
+SELECT
+learning_db-#     emp_name,
+learning_db-#     salary,
+learning_db-#     SUM(salary) OVER (
+learning_db(#         ORDER BY salary
+learning_db(#     ) AS running_total
+learning_db-# FROM employee_salary;
+ emp_name | salary | running_total
+----------+--------+---------------
+ Alice    |  50000 |         50000
+ Charlie  |  60000 |        110000
+ Eva      |  65000 |        175000
+ Bob      |  70000 |        245000
+ David    |  80000 |        325000
+ Frank    |  90000 |        415000
+(6 rows)
+
