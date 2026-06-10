@@ -1,0 +1,58 @@
+Show all customers with their orders.
+
+SELECT c.customer_id, customer_name, o.amount FROM customers c JOIN orders o ON c.customer_id = o.customer_id;
+ customer_id | customer_name | amount
+-------------+---------------+--------
+           1 | Alice         |    500
+           1 | Alice         |    700
+           3 | Charlie       |    300
+(3 rows)
+
+
+Show customers who never ordered.
+
+SELECT c.customer_id, customer_name, o.amount FROM customers c LEFT JOIN orders o ON c.customer_id = o.customer_id WHERE o.customer_id IS NULL;
+ customer_id | customer_name | amount
+-------------+---------------+--------
+           2 | Bob           |
+(1 row)
+
+Find total order amount per customer.
+
+SELECT c.customer_name, SUM(o.amount) AS total_amount FROM customers c JOIN orders o ON c.customer_id = o.customer_id GROUP BY c.customer_name;
+ customer_name | total_amount
+---------------+--------------
+ Alice         |         1200
+ Charlie       |          300
+(2 rows)
+
+Employees earning above average salary.
+
+ SELECT emp_name, salary FROM employee_salary WHERE salary > ( SELECT AVG(salary) FROM employee_salary);
+ emp_name | salary
+----------+--------
+ Bob      |  70000
+ David    |  80000
+ Frank    |  90000
+(3 rows)
+
+
+Products priced above average.
+
+ SELECT category, price FROM products WHERE price > ( SELECT AVG(price) FROM products);
+  category   | price
+-------------+-------
+ Electronics | 70000
+ Electronics | 40000
+(2 rows)
+
+Customer with highest spending.
+
+ SELECT customer_name, MAX(o.amount) FROM customers c JOIN orders o ON c.customer_id = o.customer_id GROUP BY customer_name LIMIT 1;
+ customer_name | max
+---------------+-----
+ Alice         | 700
+(1 row)
+
+
+
