@@ -1,0 +1,45 @@
+Total sales by customer
+
+SELECT customer_name, SUM(amount) FROM sales GROUP BY customer_name;
+ customer_name | sum
+---------------+------
+ Alice         |  800
+ Bob           | 1100
+ Charlie       | 1000
+(3 rows)
+
+
+Average sales
+
+SELECT AVG(amount) AS average_sales FROM sales;
+    average_sales
+----------------------
+ 580.0000000000000000
+(1 row)
+
+Customers above average sales
+
+SELECT customer_name, SUM(amount) AS total_sales FROM sales GROUP BY customer_name HAVING SUM(amount) > ( SELECT AVG(amount) FROM sales );
+ customer_name | total_sales
+---------------+-------------
+ Alice         |         800
+ Bob           |        1100
+ Charlie       |        1000
+(3 rows)
+
+Highest spender
+
+SELECT customer_name, SUM(amount) AS total_sales FROM sales GROUP BY customer_name ORDER BY total_sales DESC LIMIT 1;
+ customer_name | total_sales
+---------------+-------------
+ Bob           |        1100
+(1 row)
+
+Lowest spender
+
+
+learning_db=# SELECT customer_name, SUM(amount) AS total_sales FROM sales GROUP BY customer_name ORDER BY total_sales ASC LIMIT 1;
+ customer_name | total_sales
+---------------+-------------
+ Alice         |         800
+(1 row)
