@@ -1,0 +1,89 @@
+CREATE TABLE orders (
+    order_id INT PRIMARY KEY,
+    customer_id INT,
+    amount NUMERIC(10,2)
+);
+
+INSERT INTO orders VALUES
+(101, 1, 500),
+(102, 1, 700),
+(103, 2, 400),
+(104, 3, 1000),
+(105, 3, 300),
+(106, 4, 800);
+
+CREATE TABLE customers (
+    customer_id INT PRIMARY KEY,
+    customer_name VARCHAR(50),
+    city VARCHAR(50)
+);
+
+INSERT INTO customers VALUES
+(1, 'Alice', 'Mumbai'),
+(2, 'Bob', 'Pune'),
+(3, 'Charlie', 'Delhi'),
+(4, 'David', 'Bangalore'),
+(5, 'Emma', 'Chennai');
+
+
+
+Total sales by city
+
+SELECT c.city, SUM(o.amount) AS total_amount FROM customer c JOIN orders_2 o ON c.customer_id = o.customer_id GROUP BY c.city;
+   city    | total_amount
+-----------+--------------
+ Mumbai    |      1200.00
+ Pune      |       400.00
+ Delhi     |      1300.00
+ Bangalore |       800.00
+(4 rows)
+
+Customer with highest spending
+
+ SELECT c.customer_name, SUM(o.amount) AS total_amount FROM customer c JOIN orders_2 o ON c.customer_id = o.customer_id GROUP BY c.customer_name ORDER BY total_amount DESC LIMIT 1;
+ customer_name | total_amount
+---------------+--------------
+ Charlie       |      1300.00
+(1 row)
+
+Cities with sales above average
+
+SELECT c.city, SUM(o.amount) AS total_amount FROM customer c JOIN orders_2 o ON c.customer_id = o.customer_id GROUP BY c.city HAVING SUM(o.amount) > (SELECT AVG(amount) FROM orders_2);
+   city    | total_amount
+-----------+--------------
+ Mumbai    |      1200.00
+ Delhi     |      1300.00
+ Bangalore |       800.00
+(3 rows)
+
+Customers without orders
+
+
+SELECT c.customer_name FROM customer c LEFT JOIN orders_2 o ON c.customer_id = o.customer_id WHERE o.customer_id IS NULL;
+ customer_name
+---------------
+ Emma
+(1 row)
+
+
+Average order value by city
+
+SELECT c.city,
+learning_db-# AVG(o.amount) AS avg_order_value
+learning_db-# FROM customer c
+learning_db-# JOIN orders_2 o
+learning_db-# ON c.customer_id = o.customer_id
+learning_db-# GROUP BY c.city;
+   city    |   avg_order_value
+-----------+----------------------
+ Mumbai    | 600.0000000000000000
+ Pune      | 400.0000000000000000
+ Delhi     | 650.0000000000000000
+ Bangalore | 800.0000000000000000
+(4 rows)
+
+
+
+
+
+
