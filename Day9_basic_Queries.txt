@@ -1,0 +1,75 @@
+SELECT * FROM customer;
+ customer_id | customer_name |   city
+-------------+---------------+-----------
+           1 | Alice         | Mumbai
+           2 | Bob           | Pune
+           3 | Charlie       | Delhi
+           4 | David         | Bangalore
+           5 | Emma          | Chennai
+(5 rows)
+
+SELECT * FROM orders_2;
+ order_id | customer_id | amount
+----------+-------------+---------
+      101 |           1 |  500.00
+      102 |           1 |  700.00
+      103 |           2 |  400.00
+      104 |           3 | 1000.00
+      105 |           3 |  300.00
+      106 |           4 |  800.00
+(6 rows)
+
+Total sales by city
+
+ SELECT c.city, SUM(o.amount) AS total_sales FROM customer c JOIN orders_2 o ON c.customer_id = o.customer_id GROUP BY c.city;
+   city    | total_sales
+-----------+-------------
+ Mumbai    |     1200.00
+ Pune      |      400.00
+ Delhi     |     1300.00
+ Bangalore |      800.00
+(4 rows)
+
+
+
+Highest revenue city
+
+SELECT c.city, SUM(o.amount) AS total_sales FROM customer c JOIN orders_2 o ON c.customer_id = o.customer_id GROUP BY c.city ORDER BY total_sales DESC LIMIT 1;
+ city  | total_sales
+-------+-------------
+ Delhi |     1300.00
+(1 row)
+
+Average sales by city
+
+ SELECT c.city, AVG(o.amount) AS avg_sales_by_city FROM customer c JOIN orders_2 o ON c.customer_id = o.customer_id GROUP BY c.city;
+   city    |  avg_sales_by_city
+-----------+----------------------
+ Mumbai    | 600.0000000000000000
+ Pune      | 400.0000000000000000
+ Delhi     | 650.0000000000000000
+ Bangalore | 800.0000000000000000
+(4 rows)
+
+Cities above average revenue
+
+SELECT c.city, SUM(o.amount) AS total_sales FROM customer c JOIN orders_2 o ON c.customer_id = o.customer_id GROUP BY c.city HAVING SUM(o.amount) > (SELECT AVG(amount) FROM orders_2);
+   city    | total_sales
+-----------+-------------
+ Mumbai    |     1200.00
+ Delhi     |     1300.00
+ Bangalore |      800.00
+(3 rows)
+
+
+Customer with highest spending
+
+SELECT c.customer_name, SUM(o.amount) AS total_sales FROM customer c JOIN orders_2 o ON c.customer_id = o.customer_id GROUP BY c.customer_name ORDER BY total_sales DESC LIMIT 1;
+ customer_name | total_sales
+---------------+-------------
+ Charlie       |     1300.00
+(1 row)
+
+
+
+
