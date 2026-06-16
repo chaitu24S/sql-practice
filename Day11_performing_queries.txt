@@ -1,0 +1,89 @@
+CREATE TABLE sales_fact_2 (     sale_id INT PRIMARY KEY,
+learning_db(#     customer_id INT,
+learning_db(#     date_id INT,
+learning_db(#     amount NUMERIC(10,2)
+learning_db(# );
+CREATE TABLE
+
+ INSERT INTO sales_fact_2 (sale_id, customer_id, date_id, amount) VALUES
+learning_db-# (1, 1, 101, 500),
+learning_db-# (2, 2, 101, 700),
+learning_db-# (3, 1, 102, 300),
+learning_db-# (4, 3, 102, 1000),
+learning_db-# (5, 2, 103, 400),
+learning_db-# (6, 4, 103, 800),
+learning_db-# (7, 3, 104, 600),
+learning_db-# (8, 5, 104, 200);
+INSERT 0 8
+
+
+CREATE TABLE date_dim (    date_id INT PRIMARY KEY,    month VARCHAR(20),    year INT);
+CREATE TABLE
+
+ INSERT INTO date_dim (date_id, month, year)
+learning_db-# VALUES
+learning_db-# (101, 'January', 2025),
+learning_db-# (102, 'February', 2025),
+learning_db-# (103, 'March', 2025),
+learning_db-# (104, 'April', 2025),
+learning_db-# (105, 'May', 2025);
+INSERT 0 5
+
+CREATE TABLE customer_dim_2 (
+learning_db(#     customer_id INT PRIMARY KEY,
+learning_db(#     customer_name VARCHAR(100),
+learning_db(#     city VARCHAR(100)
+learning_db(# );
+CREATE TABLE
+
+INSERT INTO customer_dim_2 (customer_id, customer_name, city)
+learning_db-# VALUES
+learning_db-# (1, 'Alice', 'Mumbai'),
+learning_db-# (2, 'Bob', 'Pune'),
+learning_db-# (3, 'Charlie', 'Delhi'),
+learning_db-# (4, 'David', 'Bangalore'),
+learning_db-# (5, 'Emma', 'Chennai');
+INSERT 0 5
+
+Total sales by month
+
+ SELECT d.month, SUM(s.amount) AS total_sales_by_mnth FROM date_dim d JOIN sales_fact_2 s ON d.date_id = s.date_id GROUP BY d.month;
+  month   | total_sales_by_mnth
+----------+---------------------
+ March    |             1200.00
+ April    |              800.00
+ February |             1300.00
+ January  |             1200.00
+(4 rows)
+
+Total sales by city
+
+SELECT c.city, SUM(s.amount) AS total_sales_by_city FROM customer_dim_2 c JOIN sales_fact_2 s ON c.customer_id = s.customer_id GROUP BY c.city;
+   city    | total_sales_by_city
+-----------+---------------------
+ Mumbai    |              800.00
+ Pune      |             1100.00
+ Delhi     |             1600.00
+ Chennai   |              200.00
+ Bangalore |              800.00
+(5 rows)
+
+Highest revenue month
+
+SELECT d.month, SUM(s.amount) AS total_sales_by_mnth FROM date_dim d JOIN sales_fact_2 s ON d.date_id = s.date_id GROUP BY d.month ORDER BY total_sales_by_mnth DESC LIMIT 1;
+  month   | total_sales_by_mnth
+----------+---------------------
+ February |             1300.00
+(1 row)
+
+
+Customers spending above average
+
+SELECT c.customer_name, SUM(s.amount) AS customer_abv_avg FROM customer_dim_2 c JOIN sales_fact_2 s ON c.customer_id = s.customer_id GROUP BY c.customer_name HAVING SUM(s.amount) > (SELECT AVG(amount) FROM sales_fact_2);
+ customer_name | customer_abv_avg
+---------------+------------------
+ David         |           800.00
+ Alice         |           800.00
+ Bob           |          1100.00
+ Charlie       |          1600.00
+(4 rows)
