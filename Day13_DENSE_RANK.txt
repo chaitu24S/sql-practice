@@ -1,0 +1,52 @@
+Third highest salary
+
+SELECT emp_name, salary FROM ( SELECT emp_name, salary, DENSE_RANK() OVER(ORDER BY salary DESC) AS slry_rnk FROM employee_salary_2) t WHERE slry_rnk = 3;
+ emp_name | salary
+----------+--------
+ Bob      |  70000
+(1 row)
+
+Top 2 employees in each department
+
+SELECT emp_name, department, salary FROM ( SELECT emp_name, department, salary, DENSE_RANK() OVER(PARTITION BY department ORDER BY salary DESC) AS slry_rnk FROM employee_salary_2) t WHERE slry_rnk <= 2;
+ emp_name | department | salary
+----------+------------+--------
+ Frank    | Finance    |  90000
+ Eva      | HR         |  65000
+ Charlie  | HR         |  60000
+ David    | IT         |  80000
+ Bob      | IT         |  70000
+(5 rows)
+
+Running sales total
+
+SELECT emp_name, salary, SUM(salary) OVER(ORDER BY salary DESC) AS cum_slry FROM employee_salary_2;
+ emp_name | salary | cum_slry
+----------+--------+----------
+ Frank    |  90000 |    90000
+ David    |  80000 |   170000
+ Bob      |  70000 |   240000
+ Eva      |  65000 |   305000
+ Charlie  |  60000 |   365000
+ Alice    |  50000 |   415000
+(6 rows)
+
+Department average salary
+
+ SELECT department, AVG(salary) AS avg_salary_by_dept FROM employee_salary_2 GROUP BY department;
+ department | avg_salary_by_dept
+------------+--------------------
+ Finance    | 90000.000000000000
+ IT         | 66666.666666666667
+ HR         | 62500.000000000000
+(3 rows)
+
+Employees earning above department average
+
+SELECT department, emp_name, salary FROM employee_salary_2 e WHERE salary > (SELECT AVG(salary) FROM employee_salary_2 WHERE department = e.department);
+ department | emp_name | salary
+------------+----------+--------
+ IT         | Bob      |  70000
+ IT         | David    |  80000
+ HR         | Eva      |  65000
+(3 rows)
