@@ -1,0 +1,71 @@
+Total sales by city.
+
+ SELECT c.city, SUM(s.amount) AS total_sales FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.city;
+   city    | total_sales
+-----------+-------------
+ Mumbai    |    55000.00
+ Pune      |    35000.00
+ Delhi     |    56000.00
+ Chennai   |     8000.00
+ Bangalore |    15000.00
+(5 rows)
+
+Total sales by product category.
+
+SELECT p.category, SUM(s.amount) AS total_sales FROM products_dim p JOIN sales_fact s ON p.product_id = s.product_id GROUP BY p.category;
+  category   | total_sales
+-------------+-------------
+ Furniture   |    23000.00
+ Electronics |   130000.00
+ Footwear    |    16000.00
+(3 rows)
+
+Customer who spent the most.
+
+SELECT c.customer_name, MAX(s.amount) AS max_odr_empy FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.customer_name LIMIT 1;
+ customer_name | max_odr_empy
+---------------+--------------
+ David         |     15000.00
+(1 row)
+
+
+City with the highest revenue.
+
+SELECT c.city, SUM(s.amount) AS max_odr_cty FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.city ORDER BY max_odr_cty DESC LIMIT 1;
+ city  | max_odr_cty
+-------+-------------
+ Delhi |    56000.00
+(1 row)
+
+Average sales by category.
+
+SELECT p.category, AVG(s.amount) AS avg_amt_ctgy FROM products_dim p JOIN sales_fact s ON p.product_id = s.product_id GROUP BY p.category;
+  category   |      avg_amt_ctgy
+-------------+------------------------
+ Furniture   | 11500.0000000000000000
+ Electronics |     43333.333333333333
+ Footwear    |  5333.3333333333333333
+(3 rows)
+
+Customers spending above the overall average.
+
+ SELECT c.customer_name, SUM(s.amount) AS total_amt  FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.customer_name HAVING SUM(s.amount) > (SELECT AVG(amount) FROM sales_fact);
+ customer_name | total_amt
+---------------+-----------
+ Alice         |  55000.00
+ Bob           |  35000.00
+ Charlie       |  56000.00
+(3 rows)
+
+Number of products sold in each category.
+
+SELECT p.category, COUNT(s.product_id) AS ttl_prd_sales FROM products_dim p JOIN sales_fact s ON p.product_id = s.product_id GROUP BY p.category;
+  category   | ttl_prd_sales
+-------------+---------------
+ Furniture   |             2
+ Electronics |             3
+ Footwear    |             3
+(3 rows)
+
+
+
