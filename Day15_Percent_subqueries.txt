@@ -1,0 +1,56 @@
+Top 2 customers by spending.
+
+SELECT c.customer_name, SUM(s.amount) AS total_spnd FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.customer_name ORDER BY total_spnd DESC LIMIT 2;
+ customer_name | total_spnd
+---------------+------------
+ Charlie       |   56000.00
+ Alice         |   55000.00
+(2 rows)
+
+Top category by revenue.
+
+SELECT p.category, SUM(s.amount) AS ttl_vlu FROM products_dim p JOIN sales_fact s ON p.product_id = s.product_id GROUP BY p.category ORDER BY ttl_vlu DESC LIMIT 1;
+  category   |  ttl_vlu
+-------------+-----------
+ Electronics | 130000.00
+(1 row)
+
+Percentage contribution of each city to total sales.
+
+ SELECT c.city, SUM(s.amount) AS ttl_sls, ROUND(SUM(s.amount) * 100.0 / SUM(SUM(s.amount)) OVER(), 2) AS percentage_contro FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.city;
+   city    | ttl_sls  | percentage_contro
+-----------+----------+-------------------
+ Mumbai    | 55000.00 |             32.54
+ Pune      | 35000.00 |             20.71
+ Delhi     | 56000.00 |             33.14
+ Chennai   |  8000.00 |              4.73
+ Bangalore | 15000.00 |              8.88
+(5 rows)
+Running total of sales ordered by amount.
+
+ SELECT amount, SUM(amount) OVER(ORDER BY amount DESC) FROM sales_fact;
+  amount  |    sum
+----------+-----------
+ 50000.00 | 100000.00
+ 50000.00 | 100000.00
+ 30000.00 | 130000.00
+ 15000.00 | 145000.00
+  8000.00 | 153000.00
+  6000.00 | 159000.00
+  5000.00 | 169000.00
+  5000.00 | 169000.00
+(8 rows)
+
+Rank customers by spending.
+
+SELECT customer_name,
+       ttl_spd,
+       RANK() OVER (ORDER BY ttl_spd DESC) AS rnk
+FROM (
+    SELECT c.customer_name,
+           SUM(s.amount) AS ttl_spd
+    FROM customer_dim c
+    JOIN sales_fact s
+    ON c.customer_id = s.customer_id
+    GROUP BY c.customer_name
+) t;
