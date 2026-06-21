@@ -1,0 +1,93 @@
+Top 3 cities by revenue.
+
+SELECT c.city, SUM(s.amount) AS ttl_sls_by_cty FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.city ORDER BY ttl_sls_by_cty DESC LIMIT 3;
+   city    | ttl_sls_by_cty
+-----------+----------------
+ Mumbai    |      100000.00
+ Hyderabad |       67500.00
+ Delhi     |       61500.00
+(3 rows)
+
+Top product category.
+
+SELECT p.category, SUM(s.amount) AS ttl_sls_by_ctgy FROM products_dim p JOIN sales_fact s ON p.product_id = s.product_id GROUP BY p.category ORDER BY ttl_sls_by_ctgy DESC LIMIT 1;
+  category   | ttl_sls_by_ctgy
+-------------+-----------------
+ Electronics |       269500.00
+(1 row)
+
+Running total of revenue.
+
+SELECT city, revenue, AVG(revenue) OVER(ORDER BY revenue DESC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_rev FROM(SELECT c.city, AVG(s.amount) AS revenue FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.city) t;
+   city    |        revenue         |      running_rev
+-----------+------------------------+------------------------
+ Hyderabad |     33750.000000000000 |     33750.000000000000
+ Mumbai    |     33333.333333333333 |     33541.666666666667
+ Surat     |     25000.000000000000 |     30694.444444444444
+ Patna     |     22000.000000000000 |     28520.833333333333
+ Delhi     |     20500.000000000000 |     26916.666666666667
+ Ahmedabad |     19750.000000000000 |     25722.222222222222
+ Nagpur    | 18000.0000000000000000 | 24619.0476190476190000
+ Kolkata   |     17000.000000000000 | 23666.6666666666666250
+ Jaipur    |     17000.000000000000 | 22925.9259259259258889
+ Pune      |     15333.333333333333 | 22166.6666666666666000
+ Chennai   | 14000.0000000000000000 | 21424.2424242424241818
+ Lucknow   | 12000.0000000000000000 | 20638.8888888888888333
+ Bangalore |  9000.0000000000000000 | 19743.5897435897435385
+ Bhopal    |  8000.0000000000000000 | 18904.7619047619047143
+ Indore    |  7000.0000000000000000 | 18111.1111111111110667
+(15 rows)
+
+Revenue contribution (%) by city.
+
+SELECT c.city, SUM(s.amount) AS ttl_sls, ROUND( SUM(s.amount) * 100.00 / SUM(SUM(s.amount)) OVER(),2) AS percetage_rev FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.city ORDER BY percetage_rev DESC;
+   city    |  ttl_sls  | percetage_rev
+-----------+-----------+---------------
+ Mumbai    | 100000.00 |         18.78
+ Hyderabad |  67500.00 |         12.68
+ Delhi     |  61500.00 |         11.55
+ Pune      |  46000.00 |          8.64
+ Ahmedabad |  39500.00 |          7.42
+ Kolkata   |  34000.00 |          6.38
+ Jaipur    |  34000.00 |          6.38
+ Chennai   |  28000.00 |          5.26
+ Surat     |  25000.00 |          4.69
+ Lucknow   |  24000.00 |          4.51
+ Patna     |  22000.00 |          4.13
+ Bangalore |  18000.00 |          3.38
+ Nagpur    |  18000.00 |          3.38
+ Bhopal    |   8000.00 |          1.50
+ Indore    |   7000.00 |          1.31
+(15 rows)
+
+Rank customers by spending.
+
+SELECT customer_name, ttl_sls, RANK() OVER(ORDER BY ttl_sls DESC) FROM(SELECT c.customer_name, SUM(s.amount) AS ttl_sls FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.customer_name ORDER BY ttl_sls DESC);
+ customer_name | ttl_sls  | rank
+---------------+----------+------
+ Frank         | 65000.00 |    1
+ Charlie       | 56000.00 |    2
+ Alice         | 55000.00 |    3
+ Pam           | 45000.00 |    4
+ Bob           | 35000.00 |    5
+ Henry         | 35000.00 |    5
+ Victor        | 30000.00 |    7
+ Ivy           | 28000.00 |    8
+ Kevin         | 25000.00 |    9
+ Nina          | 22000.00 |   10
+ Tom           | 20000.00 |   11
+ Lily          | 18000.00 |   12
+ David         | 15000.00 |   13
+ Yash          | 15000.00 |   13
+ Quinn         | 11000.00 |   15
+ Jack          |  9000.00 |   16
+ Emma          |  8000.00 |   17
+ Oscar         |  8000.00 |   17
+ Mike          |  7000.00 |   19
+ Xavier        |  6000.00 |   20
+ Ryan          |  5500.00 |   21
+ Wendy         |  4500.00 |   22
+ Grace         |  4000.00 |   23
+ Sophia        |  3000.00 |   24
+ Uma           |  2500.00 |   25
+(25 rows)
