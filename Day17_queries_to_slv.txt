@@ -1,0 +1,65 @@
+Top 3 customers by revenue.
+
+SELECT c.customer_name, SUM(s.amount) AS ttk_rev FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.customer_name ORDER By ttk_rev DESC LIMIT 3;
+ customer_name | ttk_rev
+---------------+----------
+ Frank         | 65000.00
+ Charlie       | 56000.00
+ Alice         | 55000.00
+(3 rows)
+
+Running revenue.
+
+SELECT city, ttl_sls, SUM(ttl_sls) OVER(ORDER BY ttl_sls DESC) FROM(SELECT c.city, SUM(s.amount) AS ttl_sls FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.city) t;
+   city    |  ttl_sls  |    sum
+-----------+-----------+-----------
+ Mumbai    | 100000.00 | 100000.00
+ Hyderabad |  67500.00 | 167500.00
+ Delhi     |  61500.00 | 229000.00
+ Pune      |  46000.00 | 275000.00
+ Ahmedabad |  39500.00 | 314500.00
+ Kolkata   |  34000.00 | 382500.00
+ Jaipur    |  34000.00 | 382500.00
+ Chennai   |  28000.00 | 410500.00
+ Surat     |  25000.00 | 435500.00
+ Lucknow   |  24000.00 | 459500.00
+ Patna     |  22000.00 | 481500.00
+ Bangalore |  18000.00 | 517500.00
+ Nagpur    |  18000.00 | 517500.00
+ Bhopal    |   8000.00 | 525500.00
+ Indore    |   7000.00 | 532500.00
+(15 rows)
+
+Revenue by category.
+
+SELECT p.category, SUM(s.amount) AS ttl_rvn_ctgy FROM products_dim p JOIN sales_fact s ON p.product_id = s.product_id GROUP BY p.category ORDER BY ttl_rvn_ctgy DESC;
+  category   | ttl_rvn_ctgy
+-------------+--------------
+ Electronics |    269500.00
+ Appliances  |    121500.00
+ Furniture   |    107000.00
+ Footwear    |     34500.00
+(4 rows)
+
+Percentage contribution by city.
+
+
+SELECT c.city, SUM(s.amount) AS ttl_sls, ROUND(SUM(s.amount) *100.00 / SUM(SUM(s.amount)) OVER(),2) AS percent_contro FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.city ORDER BY percent_contro DESC;
+   city    |  ttl_sls  | percent_contro
+-----------+-----------+----------------
+ Mumbai    | 100000.00 |          18.78
+ Hyderabad |  67500.00 |          12.68
+ Delhi     |  61500.00 |          11.55
+ Pune      |  46000.00 |           8.64
+ Ahmedabad |  39500.00 |           7.42
+ Kolkata   |  34000.00 |           6.38
+ Jaipur    |  34000.00 |           6.38
+ Chennai   |  28000.00 |           5.26
+ Surat     |  25000.00 |           4.69
+ Lucknow   |  24000.00 |           4.51
+ Patna     |  22000.00 |           4.13
+ Bangalore |  18000.00 |           3.38
+ Nagpur    |  18000.00 |           3.38
+ Bhopal    |   8000.00 |           1.50
+ Indore    |   7000.00 |           1.31
+(15 rows)
