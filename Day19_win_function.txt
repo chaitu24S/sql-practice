@@ -1,0 +1,91 @@
+Top customer by city.
+
+ SELECT city, customer_name, ttl_spnt FROM(SELECT c.city, c.customer_name, SUM(s.amount) AS ttl_spnt, ROW_NUMBER() OVER(PARTITION BY c.city ORDER BY SUM(s.amount) DESC) AS rn FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.city, c.customer_name) t WHERE rn =1;
+   city    | customer_name | ttl_spnt
+-----------+---------------+----------
+ Ahmedabad | Henry         | 35000.00
+ Bangalore | David         | 15000.00
+ Bhopal    | Oscar         |  8000.00
+ Chennai   | Tom           | 20000.00
+ Delhi     | Charlie       | 56000.00
+ Hyderabad | Frank         | 65000.00
+ Indore    | Mike          |  7000.00
+ Jaipur    | Ivy           | 28000.00
+ Kolkata   | Victor        | 30000.00
+ Lucknow   | Yash          | 15000.00
+ Mumbai    | Alice         | 55000.00
+ Nagpur    | Lily          | 18000.00
+ Patna     | Nina          | 22000.00
+ Pune      | Bob           | 35000.00
+ Surat     | Kevin         | 25000.00
+(15 rows)
+
+Second highest spending customer in each city.
+
+
+learning_db=# SELECT city, customer_name, ttl_spnt FROM(SELECT c.city, c.customer_name, SUM(s.amount) AS ttl_spnt, DENSE_RANK() OVER(PARTITION BY c.city ORDER BY SUM(s.amount) DESC) AS rnk FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.city, c.customer_name) t WHERE rnk = 2;
+   city    | customer_name | ttl_spnt
+-----------+---------------+----------
+ Ahmedabad | Wendy         |  4500.00
+ Bangalore | Sophia        |  3000.00
+ Chennai   | Emma          |  8000.00
+ Delhi     | Ryan          |  5500.00
+ Hyderabad | Uma           |  2500.00
+ Jaipur    | Xavier        |  6000.00
+ Kolkata   | Grace         |  4000.00
+ Lucknow   | Jack          |  9000.00
+ Mumbai    | Pam           | 45000.00
+ Pune      | Quinn         | 11000.00
+(10 rows)
+
+
+Running revenue by category.
+
+SELECT category, ttl_rev, SUM(ttl_rev) OVER(ORDER BY ttl_rev DESC) AS running_ttl_rev FROM(SELECT p.category, SUM(s.amount) AS ttl_rev FROM products_dim p JOIN sales_fact s ON p.product_id = s.product_id GROUP BY p.category) t;
+  category   |  ttl_rev  | running_ttl_rev
+-------------+-----------+-----------------
+ Electronics | 269500.00 |       269500.00
+ Appliances  | 121500.00 |       391000.00
+ Furniture   | 107000.00 |       498000.00
+ Footwear    |  34500.00 |       532500.00
+(4 rows)
+
+Average revenue by city.
+
+SELECT c.city, ROUND(AVG(s.amount), 2) AS avg_rev FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.city ORDER BY avg_rev DESC;
+   city    | avg_rev
+-----------+----------
+ Hyderabad | 33750.00
+ Mumbai    | 33333.33
+ Surat     | 25000.00
+ Patna     | 22000.00
+ Delhi     | 20500.00
+ Ahmedabad | 19750.00
+ Nagpur    | 18000.00
+ Kolkata   | 17000.00
+ Jaipur    | 17000.00
+ Pune      | 15333.33
+ Chennai   | 14000.00
+ Lucknow   | 12000.00
+ Bangalore |  9000.00
+ Bhopal    |  8000.00
+ Indore    |  7000.00
+(15 rows)
+
+Find customers whose spending is greater than their city's average.
+
+SELECT c.customer_name, SUM(s.amount) AS ttl_amt FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.customer_name HAVING SUM(s.amount) > (SELECT AVG(amount) FROM sales_fact);
+ customer_name | ttl_amt
+---------------+----------
+ Kevin         | 25000.00
+ Henry         | 35000.00
+ Tom           | 20000.00
+ Nina          | 22000.00
+ Victor        | 30000.00
+ Frank         | 65000.00
+ Alice         | 55000.00
+ Ivy           | 28000.00
+ Bob           | 35000.00
+ Charlie       | 56000.00
+ Pam           | 45000.00
+(11 rows)
