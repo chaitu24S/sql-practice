@@ -1,0 +1,64 @@
+Top customer by city.
+
+SELECT city, customer_name, amount FROM(SELECT c.city, c.customer_name, s.amount, RANK() OVER(PARTITION BY c.city ORDER BY s.amount DESC) AS rnk FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id) t WHERE rnk = 1;
+   city    | customer_name |  amount
+-----------+---------------+----------
+ Ahmedabad | Henry         | 35000.00
+ Bangalore | David         | 15000.00
+ Bhopal    | Oscar         |  8000.00
+ Chennai   | Tom           | 20000.00
+ Delhi     | Charlie       | 50000.00
+ Hyderabad | Frank         | 65000.00
+ Indore    | Mike          |  7000.00
+ Jaipur    | Ivy           | 28000.00
+ Kolkata   | Victor        | 30000.00
+ Lucknow   | Yash          | 15000.00
+ Mumbai    | Alice         | 50000.00
+ Nagpur    | Lily          | 18000.00
+ Patna     | Nina          | 22000.00
+ Pune      | Bob           | 30000.00
+ Surat     | Kevin         | 25000.00
+(15 rows)
+
+Revenue by category.
+
+ SELECT p.category, SUM(s.amount) AS ttl_rev FROM products_dim  p JOIN sales_fact s ON s.product_id = p.product_id GROUP BY p.category;
+  category   |  ttl_rev
+-------------+-----------
+ Furniture   | 107000.00
+ Appliances  | 121500.00
+ Electronics | 269500.00
+ Footwear    |  34500.00
+(4 rows)
+
+Running total using window functions.
+
+ SELECT customer_name, ttl_rev, SUM(ttl_rev) OVER(ORDER BY ttl_rev DESC) FROM(SELECT c.customer_name, SUM(s.amount) AS ttl_rev FROM customer_dim c JOIN sales_fact s ON c.customer_id  = s.customer_id GROUP BY c.customer_name) t;
+ customer_name | ttl_rev  |    sum
+---------------+----------+-----------
+ Frank         | 65000.00 |  65000.00
+ Charlie       | 56000.00 | 121000.00
+ Alice         | 55000.00 | 176000.00
+ Pam           | 45000.00 | 221000.00
+ Bob           | 35000.00 | 291000.00
+ Henry         | 35000.00 | 291000.00
+ Victor        | 30000.00 | 321000.00
+ Ivy           | 28000.00 | 349000.00
+ Kevin         | 25000.00 | 374000.00
+ Nina          | 22000.00 | 396000.00
+ Tom           | 20000.00 | 416000.00
+ Lily          | 18000.00 | 434000.00
+ David         | 15000.00 | 464000.00
+ Yash          | 15000.00 | 464000.00
+ Quinn         | 11000.00 | 475000.00
+ Jack          |  9000.00 | 484000.00
+ Emma          |  8000.00 | 500000.00
+ Oscar         |  8000.00 | 500000.00
+ Mike          |  7000.00 | 507000.00
+ Xavier        |  6000.00 | 513000.00
+ Ryan          |  5500.00 | 518500.00
+ Wendy         |  4500.00 | 523000.00
+ Grace         |  4000.00 | 527000.00
+ Sophia        |  3000.00 | 530000.00
+ Uma           |  2500.00 | 532500.00
+(25 rows)
