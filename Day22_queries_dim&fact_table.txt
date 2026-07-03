@@ -1,0 +1,42 @@
+Top 3 cities by revenue.
+
+SELECT c.city, SUM(s.amount) AS ttl_rev FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.city ORDER BY ttl_rev DESC LIMIT 3;
+   city    |  ttl_rev
+-----------+-----------
+ Mumbai    | 100000.00
+ Hyderabad |  67500.00
+ Delhi     |  61500.00
+(3 rows)
+
+Customer with the highest spending in each city.
+
+SELECT city, customer_name, ttl_spnd FROM(SELECT c.city, c.customer_name, SUM(s.amount) AS ttl_spnd, DENSE_RANK() OVER(PARTITION BY c.city ORDER BY SUM(s.amount) DESC) AS rnk FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.city, c.customer_name) t WHERE rnk = 1;
+   city    | customer_name | ttl_spnd
+-----------+---------------+----------
+ Ahmedabad | Henry         | 35000.00
+ Bangalore | David         | 15000.00
+ Bhopal    | Oscar         |  8000.00
+ Chennai   | Tom           | 20000.00
+ Delhi     | Charlie       | 56000.00
+ Hyderabad | Frank         | 65000.00
+ Indore    | Mike          |  7000.00
+ Jaipur    | Ivy           | 28000.00
+ Kolkata   | Victor        | 30000.00
+ Lucknow   | Yash          | 15000.00
+ Mumbai    | Alice         | 55000.00
+ Nagpur    | Lily          | 18000.00
+ Patna     | Nina          | 22000.00
+ Pune      | Bob           | 35000.00
+ Surat     | Kevin         | 25000.00
+(15 rows)
+
+Revenue percentage contributed by each category.
+
+SELECT p.category, SUM(s.amount) ttl_amt, ROUND(SUM(s.amount)*100.0/SUM(SUM(s.amount)) OVER(),2)AS percentage_contro FROM products_dim p JOIN sales_fact s ON p.product_id = s.product_id GROUP BY p.category;
+  category   |  ttl_amt  | percentage_contro
+-------------+-----------+-------------------
+ Furniture   | 107000.00 |             20.09
+ Appliances  | 121500.00 |             22.82
+ Electronics | 269500.00 |             50.61
+ Footwear    |  34500.00 |              6.48
+(4 rows)
