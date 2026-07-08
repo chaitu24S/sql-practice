@@ -1,0 +1,52 @@
+City revenue trend.
+
+SELECT c.city, SUM(s.amount) AS ttl_rev FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.city ORDER BY ttl_rev DESC;
+   city    |  ttl_rev
+-----------+-----------
+ Mumbai    | 100000.00
+ Hyderabad |  67500.00
+ Delhi     |  61500.00
+ Pune      |  46000.00
+ Ahmedabad |  39500.00
+ Kolkata   |  34000.00
+ Jaipur    |  34000.00
+ Chennai   |  28000.00
+ Surat     |  25000.00
+ Lucknow   |  24000.00
+ Patna     |  22000.00
+ Bangalore |  18000.00
+ Nagpur    |  18000.00
+ Bhopal    |   8000.00
+ Indore    |   7000.00
+
+Top 3 customers overall.
+
+SELECT c.customer_name, SUM(s.amount) AS ttl_spnt FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.customer_name ORDER BY ttl_spnt DESC LIMIT 3;
+ customer_name | ttl_spnt
+---------------+----------
+ Frank         | 65000.00
+ Charlie       | 56000.00
+ Alice         | 55000.00
+(3 rows)
+
+Rank cities by average order value.
+
+SELECT city, avg_ord_vle, RANK() OVER(ORDER BY avg_ord_vle DESC) FROM(SELECT c.city, ROUND(AVG(s.amount),2) AS avg_ord_vle FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id GROUP BY c.city) t;
+   city    | avg_ord_vle | rank
+-----------+-------------+------
+ Hyderabad |    33750.00 |    1
+ Mumbai    |    33333.33 |    2
+ Surat     |    25000.00 |    3
+ Patna     |    22000.00 |    4
+ Delhi     |    20500.00 |    5
+ Ahmedabad |    19750.00 |    6
+ Nagpur    |    18000.00 |    7
+ Kolkata   |    17000.00 |    8
+ Jaipur    |    17000.00 |    8
+ Pune      |    15333.33 |   10
+ Chennai   |    14000.00 |   11
+ Lucknow   |    12000.00 |   12
+ Bangalore |     9000.00 |   13
+ Bhopal    |     8000.00 |   14
+ Indore    |     7000.00 |   15
+(15 rows)
