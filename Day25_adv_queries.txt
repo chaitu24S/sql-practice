@@ -1,0 +1,45 @@
+Top 3 products in each city.
+
+SELECT city, category, product_name, ttl_sls FROM(SELECT c.city, p.category, p.product_name, SUM(s.amount) AS ttl_sls, DENSE_RANK() OVER(PARTITION BY c.city ORDER BY SUM(s.amount) DESC) AS rnk FROM customer_dim c JOIN sales_fact s ON c.customer_id = s.customer_id JOIN products_dim p ON s.product_id = p.product_id GROUP BY c.city, p.category, p.product_name) t WHERE rnk <= 3 ORDER BY city, ttl_sls DESC;
+   city    |  category   |   product_name    | ttl_sls
+-----------+-------------+-------------------+----------
+ Ahmedabad | Appliances  | Refrigerator      | 35000.00
+ Ahmedabad | Appliances  | Ceiling Fan       |  4500.00
+ Bangalore | Furniture   | Dining Table      | 15000.00
+ Bangalore | Electronics | Bluetooth Speaker |  3000.00
+ Bhopal    | Electronics | Printer           |  8000.00
+ Chennai   | Electronics | Tablet            | 20000.00
+ Chennai   | Furniture   | Office Chair      |  8000.00
+ Delhi     | Electronics | iPhone 15         | 50000.00
+ Delhi     | Footwear    | Adidas Sneakers   |  6000.00
+ Delhi     | Footwear    | Formal Shoes      |  5500.00
+ Hyderabad | Electronics | Laptop            | 65000.00
+ Hyderabad | Electronics | Gaming Mouse      |  2500.00
+ Indore    | Footwear    | Running Shoes     |  7000.00
+ Jaipur    | Appliances  | Washing Machine   | 28000.00
+ Jaipur    | Footwear    | Sports Shoes      |  6000.00
+ Kolkata   | Furniture   | Wardrobe          | 30000.00
+ Kolkata   | Electronics | Headphones        |  4000.00
+ Lucknow   | Electronics | Monitor           | 15000.00
+ Lucknow   | Appliances  | Microwave         |  9000.00
+ Mumbai    | Electronics | iPhone 15         | 50000.00
+ Mumbai    | Appliances  | Air Conditioner   | 45000.00
+ Mumbai    | Footwear    | Nike Shoes        |  5000.00
+ Nagpur    | Furniture   | Study Desk        | 18000.00
+ Patna     | Electronics | Smart Watch       | 22000.00
+ Pune      | Electronics | Samsung TV        | 30000.00
+ Pune      | Furniture   | Coffee Table      | 11000.00
+ Pune      | Footwear    | Nike Shoes        |  5000.00
+ Surat     | Furniture   | Sofa              | 25000.00
+(28 rows)
+
+Find customers who spent more than twice the average spending.
+
+SELECT customer_name, ttl_spnt FROM(SELECT c.customer_name, SUM(s.amount) AS ttl_spnt FROM customer_dim c JOIN sales_fact s ON c.customer_id  = s.customer_id GROUP BY c.customer_name) t WHERE ttl_spnt > (SELECT 2 * AVG(ttl_spnt) FROM(SELECT SUM(amount) AS ttl_spnt FROM sales_fact GROUP BY customer_id) avg_spnd);
+ customer_name | ttl_spnt
+---------------+----------
+ Frank         | 65000.00
+ Alice         | 55000.00
+ Charlie       | 56000.00
+ Pam           | 45000.00
+(4 rows)
